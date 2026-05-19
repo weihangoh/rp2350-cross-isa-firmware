@@ -27,3 +27,7 @@ Regenerate them by building the workers and assembling the bytecode examples.
 ## Build
 
 See `docs/build.md`.
+
+## License
+
+This project is licensed under the Apache License 2.0.
