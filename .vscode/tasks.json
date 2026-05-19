@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+          "label": "Compile Project (Default)",
+          "type": "shell",
+          "command": "rmdir /s /q build 2>nul & cmake -G Ninja -S . -B build & cmake --build build --target firmware",
+          "options": {
+            "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+        },
+        {
+          "label": "Compile Project (CRC32, Protection Level 0, Randomized ISA)",
+          "type": "shell",
+          "command": "rmdir /s /q build 2>nul & cmake -G Ninja -S . -B build -DBCDEMO_PROGRAM=crc32 -DBCDEMO_PROGRAM_ENCRYPTED=OFF -DBCDEMO_PROTECTION_LEVEL=0 -DBCDEMO_ROUTE_MODE=random-free & cmake --build build --target firmware",
+          "options": {
+            "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+        },
+        {
+          "label": "Compile Project (Checksum, Protection Level 1, Randomized ISA)",
+          "type": "shell",
+          "command": "rmdir /s /q build 2>nul & cmake -G Ninja -S . -B build -DBCDEMO_PROGRAM=checksum -DBCDEMO_PROGRAM_ENCRYPTED=ON -DBCDEMO_PROTECTION_LEVEL=1 -DBCDEMO_ROUTE_MODE=random-free & cmake --build build --target firmware",
+          "options": {
+            "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+        },
+        {
+          "label": "Compile Project (Checksum, Protection Level 2, Randomized ISA)",
+          "type": "shell",
+          "command": "rmdir /s /q build 2>nul & cmake -G Ninja -S . -B build -DBCDEMO_PROGRAM=checksum -DBCDEMO_PROGRAM_ENCRYPTED=ON -DBCDEMO_PROTECTION_LEVEL=2 -DBCDEMO_ROUTE_MODE=random-free & cmake --build build --target firmware",
+          "options": {
+            "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+        },
+        {
+          "label": "Clean",
+          "type": "shell",
+          "command": "rmdir /s /q build 2>nul & rmdir /s /q arm_host\\build 2>nul & rmdir /s /q arm_worker\\build 2>nul & rmdir /s /q riscv_worker\\build 2>nul",
+          "options": {
+            "cwd": "${workspaceFolder}"
+          },
+          "problemMatcher": []
+        }
+    ]
+}

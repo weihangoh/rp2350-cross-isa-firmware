@@ -1,0 +1,24 @@
+; RP2350A Bytecode Demonstrator XOR checksum example.
+; Input bytes live at memory[INPUT_BASE .. INPUT_BASE+INPUT_LEN-1].
+; Output checksum is stored at OUTPUT_ADDR.
+
+.input_base 100
+.input_len 69
+.output_addr 10
+.expected_output 0x00000044
+
+LOADI r0, 0          ; checksum
+LOADI r1, 0          ; index
+LOADI r2, INPUT_LEN  ; length
+LOADI r3, INPUT_BASE ; input base
+LOADI r6, 1          ; constant 1
+
+loop:
+LOADR r4, r3, r1     ; r4 = memory[input_base + index]
+XOR   r0, r0, r4     ; checksum ^= byte
+ADD   r1, r1, r6     ; index++
+CMP   r1, r2         ; index == length?
+JNZ   loop           ; if not, continue
+
+STORE r0, OUTPUT_ADDR
+HALT

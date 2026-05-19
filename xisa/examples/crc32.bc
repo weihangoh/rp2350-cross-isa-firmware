@@ -1,0 +1,128 @@
+; RP2350A Bytecode Demonstrator CRC32 example.
+;
+; Computes standard reflected CRC32:
+;   init   = 0xffffffff
+;   poly   = 0xedb88320
+;   xorout = 0xffffffff
+;
+; Output is stored little-endian:
+;   memory[OUTPUT_ADDR + 0] = crc & 0xff
+;   memory[OUTPUT_ADDR + 1] = crc >> 8
+;   memory[OUTPUT_ADDR + 2] = crc >> 16
+;   memory[OUTPUT_ADDR + 3] = crc >> 24
+;
+; Output is stored little-endian at OUTPUT_ADDR..OUTPUT_ADDR+3.
+; For the default 69-byte input string used by the RP2350A Bytecode Demonstrator host, expected CRC32 is 0x650ae0b3.
+
+.input_base 100
+.input_len 69
+.output_addr 10
+.expected_output 0x650ae0b3
+
+.const OUT0 10
+.const OUT1 11
+.const OUT2 12
+.const OUT3 13
+
+; Registers:
+; r0 = crc
+; r1 = byte index
+; r2 = input length
+; r3 = input base
+; r4 = bit counter
+; r5 = temp
+; r6 = constant 1
+; r7 = polynomial 0xedb88320
+
+; r0 = 0xffffffff
+LOADI r0, 255
+SHL   r0, r0, 8
+ADDI  r0, r0, 255
+SHL   r0, r0, 8
+ADDI  r0, r0, 255
+SHL   r0, r0, 8
+ADDI  r0, r0, 255
+
+; r1 = index = 0
+LOADI r1, 0
+
+; r2 = input length
+LOADI r2, INPUT_LEN
+
+; r3 = input base
+LOADI r3, INPUT_BASE
+
+; r6 = 1
+LOADI r6, 1
+
+; r7 = 0xedb88320
+LOADI r7, 237
+SHL   r7, r7, 8
+ADDI  r7, r7, 184
+SHL   r7, r7, 8
+ADDI  r7, r7, 131
+SHL   r7, r7, 8
+ADDI  r7, r7, 32
+
+byte_loop:
+; r5 = input[index]
+LOADR r5, r3, r1
+
+; crc ^= byte
+XOR   r0, r0, r5
+
+; bit counter = 0
+LOADI r4, 0
+
+bit_loop:
+; if (crc & 1) == 0, go to bit_zero
+AND   r5, r0, r6
+CMP   r5, r6
+JNZ   bit_zero
+
+; crc = (crc >> 1) ^ poly
+SHR   r0, r0, 1
+XOR   r0, r0, r7
+JMP   bit_done
+
+bit_zero:
+; crc = crc >> 1
+SHR   r0, r0, 1
+
+bit_done:
+; bit_counter++
+ADDI  r4, r4, 1
+
+; while bit_counter != 8
+LOADI r5, 8
+CMP   r4, r5
+JNZ   bit_loop
+
+; index++
+ADDI  r1, r1, 1
+
+; while index != input_len
+CMP   r1, r2
+JNZ   byte_loop
+
+; final xorout: crc ^= 0xffffffff
+LOADI r5, 255
+SHL   r5, r5, 8
+ADDI  r5, r5, 255
+SHL   r5, r5, 8
+ADDI  r5, r5, 255
+SHL   r5, r5, 8
+ADDI  r5, r5, 255
+
+XOR   r0, r0, r5
+
+; Store CRC32 little-endian.
+STORE r0, OUT0
+SHR   r0, r0, 8
+STORE r0, OUT1
+SHR   r0, r0, 8
+STORE r0, OUT2
+SHR   r0, r0, 8
+STORE r0, OUT3
+
+HALT

@@ -1,0 +1,13 @@
+#pragma once
+#include "bcdemo_shared.h"
+
+#ifndef BCDEMO_ROUTE_DEFAULT
+#define BCDEMO_ROUTE_DEFAULT BCDEMO_ROUTE_RANDOM_FREE
+#endif
+
+#ifndef BCDEMO_DEBUG_PRINT_EACH_STAGE
+#define BCDEMO_DEBUG_PRINT_EACH_STAGE 0
+#endif
+
+#define BCDEMO_USB_WAIT_FINAL_MS 10000
+#define BCDEMO_USB_WAIT_DEBUG_MS 8000
